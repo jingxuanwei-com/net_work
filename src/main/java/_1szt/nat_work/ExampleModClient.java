@@ -1,4 +1,4 @@
-package com.example.examplemod;
+package _1szt.nat_work;
 
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
