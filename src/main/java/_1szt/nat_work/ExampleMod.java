@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import _1szt.motd.Motd;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -90,6 +92,7 @@ public class ExampleMod {
 
     private void commonSetup(FMLCommonSetupEvent event) {
         // Some common setup code
+        Motd.Run();
         LOGGER.info("HELLO FROM COMMON SETUP");
 
         if (Config.LOG_DIRT_BLOCK.getAsBoolean()) {
