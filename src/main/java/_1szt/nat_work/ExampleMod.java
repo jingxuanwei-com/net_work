@@ -36,19 +36,24 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 // 此值必须与 META-INF/neoforge.mods.toml 文件中的条目一致
 @Mod(ExampleMod.MODID)
 public class ExampleMod {
-    // 定义模组 ID，所有地方通过此常量引用
+    // 定义字符串 MODID，所有地方通过此常量引用
     public static final String MODID = "nat_work";
-    // 直接引用 SLF4J 日志记录器，用于输出日志信息
+
+    //定义 SLF4J 日志记录器，用于输出日志信息
     public static final Logger LOGGER = LogUtils.getLogger();
-    // 创建延迟注册表，用于注册方块（Blocks），所有方块将在 "nat_work" 命名空间下注册
+
+    // 创建延迟注册表，用于注册方块（Blocks），所有方块将在 "MODID" 命名空间下注册
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
-    // 创建延迟注册表，用于注册物品（Items），所有物品将在 "nat_work" 命名空间下注册
+
+    // 创建延迟注册表，用于注册物品（Items），所有物品将在 "MODID" 命名空间下注册
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
+
     // 创建延迟注册表，用于注册创造模式标签页（CreativeModeTabs）
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
     // 注册一个ID为 "nat_work:example_block" 的简单方块，材质为石头颜色
     public static final DeferredBlock<Block> EXAMPLE_BLOCK = BLOCKS.registerSimpleBlock("example_block", BlockBehaviour.Properties.of().mapColor(MapColor.STONE));
+    
     // 为上述方块注册对应的方块物品（BlockItem），ID 同样为 "nat_work:example_block"
     public static final DeferredItem<BlockItem> EXAMPLE_BLOCK_ITEM = ITEMS.registerSimpleBlockItem("example_block", EXAMPLE_BLOCK);
 
