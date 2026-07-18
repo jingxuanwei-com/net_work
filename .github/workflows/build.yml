@@ -26,8 +26,14 @@ jobs:
           chmod +x ./gradlew
           ./gradlew build
 
+      - name: Extract versions
+        id: versions
+        run: |
+          echo "MC_VERSION=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)" >> $GITHUB_OUTPUT
+          echo "MOD_VERSION=$(grep '^mod_version=' gradle.properties | cut -d= -f2)" >> $GITHUB_OUTPUT
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nat_work-mc1.21.1-neoforge-${{ github.ref_name }}
+          name: nat_work-mc${{ steps.versions.outputs.MC_VERSION }}-neoforge-${{ steps.versions.outputs.MOD_VERSION }}
           path: build/libs/*.jar
