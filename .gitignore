@@ -26,8 +26,6 @@ out/
 bin/
 !**/src/**/bin/
 
-### VS Code ###
-.vscode/
 
 ### Mac OS ###
 .DS_Store
@@ -38,3 +36,7 @@ run/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/
+
+### GO ###
+.env
+data
