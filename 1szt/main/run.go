@@ -1,11 +1,13 @@
 package main
 
 import (
+	"1szt/flags"
 	"1szt/motd"
-	"1szt/quic"
+	_ "1szt/quic"
+	_ "1szt/raptorq"
 )
 
 func main() {
 	motd.Run()
-	quic.Run()
+	flags.Run()
 }

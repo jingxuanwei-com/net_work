@@ -4,6 +4,7 @@ go 1.26.4
 
 require (
 	github.com/apernet/quic-go v0.60.1-0.20260618182935-599b15a1fa26
+	github.com/nyarime/gofec v1.4.1
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/exp v0.0.0-20260709172345-9ea1abe57597
 )
