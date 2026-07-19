@@ -23,7 +23,7 @@ var TcpPort = flag.String("port", "127.0.0.1:25565", "本地 TCP 端口")
 var Mode = flag.String("mode", "client", "运行模式: server / client")
 
 // Bandwidth 目标带宽 (bps)
-var Bandwidth = flag.Uint64("bandwidth", 10_000_000, "目标带宽 (bps)，如 10000000 = 10Mbps")
+var Bandwidth = flag.Uint64("bandwidth", 0, "目标带宽 (bps)，0 = 不限速")
 
 // ============ QUIC 隧道参数 ============
 
@@ -39,13 +39,13 @@ var DisableLoss = flag.Bool("disable-loss", true, "Brutal 模式无视丢包 (tr
 // ============ RaptorQ 隧道参数 ============
 
 // RqK RaptorQ 源符号数
-var RqK = flag.Int("k", 64, "RaptorQ 源符号数 (K)")
+var RqK = flag.Int("k", 8, "RaptorQ 源符号数 (K)")
 
-// RqT RaptorQ 符号大小 (建议 1200 接近 MTU)
-var RqT = flag.Int("t", 1200, "RaptorQ 符号大小 (T, bytes)")
+// RqT RaptorQ 符号大小
+var RqT = flag.Int("t", 256, "RaptorQ 符号大小 (T, bytes)")
 
 // RqRepair 修复符号比例
-var RqRepair = flag.Float64("repair", 0.2, "修复符号比例 (占K的比例)")
+var RqRepair = flag.Float64("repair", 0.25, "修复符号比例 (占K的比例)")
 
 // ---------- 隧道注册与分发 ----------
 

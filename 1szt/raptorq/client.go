@@ -128,41 +128,18 @@ func handleTCPConnection(tcpConn net.Conn, udpAddr *net.UDPAddr, codec *Codec, b
 
 	// ======== Forward path: read TCP, encode, send via UDP ========
 	var blockID uint32
-	blockSize := codec.BlockSize()
-	fwdBuf := make([]byte, blockSize)
-	var filled int
+	fwdBuf := make([]byte, 65535)
 
-	flush := func() {
-		if filled == 0 {
-			return
-		}
-		sendBlock(ctx, udpConn, pacer, codec, uint16(atomic.AddUint32(&blockID, 1)-1), fwdBuf[:filled])
-		filled = 0
-	}
-
-	flushTimeout := 50 * time.Millisecond
 	for {
-		tcpConn.SetReadDeadline(time.Now().Add(flushTimeout))
-		n, err := tcpConn.Read(fwdBuf[filled:])
+		n, err := tcpConn.Read(fwdBuf)
 		if err != nil {
-			if ne, ok := err.(net.Error); ok && ne.Timeout() {
-				if filled > 0 {
-					flush()
-				}
-				continue
-			}
-			if filled > 0 {
-				flush()
-			}
 			if err == io.EOF {
 				return nil
 			}
 			return fmt.Errorf("read TCP: %w", err)
 		}
-		filled += n
-		if filled >= blockSize {
-			flush()
-		}
+		// Send immediately — no batching
+		sendBlock(ctx, udpConn, pacer, codec, uint16(atomic.AddUint32(&blockID, 1)-1), fwdBuf[:n])
 	}
 }
 

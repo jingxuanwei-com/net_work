@@ -31,7 +31,12 @@ func NewPacedSender(bps uint64) *PacedSender {
 
 // Wait blocks until the rate limiter allows sending the given number of bytes.
 // Returns nil when ready, or ctx.Err() if context is cancelled.
+// If bps is 0, rate limiting is disabled.
 func (p *PacedSender) Wait(ctx context.Context, bytes int) error {
+	if p.bps == 0 {
+		return nil // unlimited
+	}
+
 	p.mu.Lock()
 
 	now := time.Now()
@@ -53,27 +58,21 @@ func (p *PacedSender) Wait(ctx context.Context, bytes int) error {
 
 	// Need to wait: calculate sleep time
 	needBytes := -p.allowance
+	// Reset allowance to 0 — after sleep we'll have earned exactly enough
+	p.allowance = 0
 	p.mu.Unlock()
 
 	sleepDuration := time.Duration(needBytes / (float64(p.bps) / 8) * float64(time.Second))
 	if sleepDuration > time.Second {
-		sleepDuration = time.Second // cap at 1 second
+		sleepDuration = time.Second
 	}
 
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
 	case <-time.After(sleepDuration):
-		// Deduct from allowance after sleep (use remaining time)
 		p.mu.Lock()
-		now := time.Now()
-		elapsedExtra := now.Sub(p.lastSend).Seconds()
-		p.lastSend = now
-		p.allowance += elapsedExtra * float64(p.bps) / 8
-		if p.allowance > p.maxBurst {
-			p.allowance = p.maxBurst
-		}
-		p.allowance -= float64(bytes)
+		p.lastSend = time.Now()
 		p.mu.Unlock()
 		return nil
 	}

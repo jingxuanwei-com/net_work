@@ -245,27 +245,9 @@ func (s *session) startReturnPath() {
 	retCodec := NewCodec(s.codec.K, s.codec.T, float64(s.codec.RepairCount)/float64(s.codec.K))
 	pacer := NewPacedSender(s.bandwidth)
 
-	buf := make([]byte, s.codec.BlockSize())
+	buf := make([]byte, 65535)
 	var blockID uint32
-	var filled int
 
-	flush := func() {
-		if filled == 0 {
-			return
-		}
-		block := retCodec.NewBlock(uint16(blockID), buf[:filled])
-		blockID++
-		for _, sym := range block.Symbols {
-			packet := EncodePacket(block.BlockID, retCodec.K, retCodec.T, block.DataLen, sym.ESI, sym.Data)
-			if err := pacer.Wait(s.ctx, len(packet)); err != nil {
-				return
-			}
-			s.udpConn.WriteTo(packet, s.clientAddr)
-		}
-		filled = 0
-	}
-
-	flushTimeout := 50 * time.Millisecond
 	for {
 		select {
 		case <-s.ctx.Done():
@@ -273,23 +255,20 @@ func (s *session) startReturnPath() {
 		default:
 		}
 
-		s.tcpConn.SetReadDeadline(time.Now().Add(flushTimeout))
-		n, err := s.tcpConn.Read(buf[filled:])
+		n, err := s.tcpConn.Read(buf)
 		if err != nil {
-			if ne, ok := err.(net.Error); ok && ne.Timeout() {
-				if filled > 0 {
-					flush()
-				}
-				continue
-			}
-			if filled > 0 {
-				flush()
-			}
 			return
 		}
-		filled += n
-		if filled >= len(buf) {
-			flush()
+
+		// Encode and send immediately — no batching
+		block := retCodec.NewBlock(uint16(blockID), buf[:n])
+		blockID++
+		for _, sym := range block.Symbols {
+			packet := EncodePacket(block.BlockID, retCodec.K, retCodec.T, block.DataLen, sym.ESI, sym.Data)
+			if err := pacer.Wait(s.ctx, len(packet)); err != nil {
+				return
+			}
+			s.udpConn.WriteTo(packet, s.clientAddr)
 		}
 	}
 }
