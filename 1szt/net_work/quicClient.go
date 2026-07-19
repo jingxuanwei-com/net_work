@@ -8,7 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/quic-go/quic-go"
+	"github.com/apernet/quic-go"
+
+	"1szt/internal/congestion"
 )
 
 // 作用 连接远程端口quic:ip:port 转换tcp:port
@@ -19,7 +21,7 @@ import (
 // 工作流程:
 //
 //	本地 TCP 连接 -> 打开 QUIC 流 -> 发送到远程服务端 :25588 -> 服务端转发到 TCP :25565
-func RunClient(localAddr, serverAddr string) {
+func RunClient(localAddr, serverAddr string, cc congestion.Config) {
 	tlsConf := &tls.Config{
 		InsecureSkipVerify: true,
 		NextProtos:         []string{"quic-proxy"},
@@ -33,7 +35,7 @@ func RunClient(localAddr, serverAddr string) {
 	log.Printf("[客户端] TCP 代理已启动，监听 %s，QUIC 服务器 %s", localAddr, serverAddr)
 
 	// 客户端连接管理器：自动重连
-	cm := newConnManager(serverAddr, tlsConf)
+	cm := newConnManager(serverAddr, tlsConf, cc)
 	go cm.keepAlive()
 
 	for {
@@ -72,10 +74,11 @@ type connManager struct {
 	conn    *quic.Conn
 	addr    string
 	tlsConf *tls.Config
+	cc      congestion.Config
 }
 
-func newConnManager(addr string, tlsConf *tls.Config) *connManager {
-	return &connManager{addr: addr, tlsConf: tlsConf}
+func newConnManager(addr string, tlsConf *tls.Config, cc congestion.Config) *connManager {
+	return &connManager{addr: addr, tlsConf: tlsConf, cc: cc}
 }
 
 func (cm *connManager) get() *quic.Conn {
@@ -92,6 +95,8 @@ func (cm *connManager) keepAlive() {
 				log.Printf("[客户端] 连接 QUIC 服务器失败，5秒后重试: %v", err)
 				return
 			}
+			// 应用拥塞控制配置
+			congestion.Apply(c, cm.cc)
 			cm.mu.Lock()
 			if cm.conn != nil {
 				cm.conn.CloseWithError(0, "替换旧连接")

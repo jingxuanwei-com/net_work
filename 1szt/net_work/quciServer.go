@@ -15,7 +15,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/quic-go/quic-go"
+	"github.com/apernet/quic-go"
+
+	"1szt/internal/congestion"
 )
 
 // 作用 代理端口tcp:ip:port 转换quic:port
@@ -26,7 +28,7 @@ import (
 // 工作流程:
 //
 //	客户端 QUIC 连接 -> 服务端接收 QUIC 流 -> 转发到本地 TCP :25565
-func RunServer(quicAddr, tcpTarget string) {
+func RunServer(quicAddr, tcpTarget string, cc congestion.Config) {
 	listener, err := quic.ListenAddr(quicAddr, generateTLSConfig(), nil)
 	if err != nil {
 		log.Fatalf("[服务端] QUIC 监听失败: %v", err)
@@ -40,6 +42,8 @@ func RunServer(quicAddr, tcpTarget string) {
 			log.Printf("[服务端] 接受 QUIC 连接失败: %v", err)
 			continue
 		}
+		// 应用拥塞控制配置
+		congestion.Apply(conn, cc)
 		go handleServerConn(conn, tcpTarget)
 	}
 }
