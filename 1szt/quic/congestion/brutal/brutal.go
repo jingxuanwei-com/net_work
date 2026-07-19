@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"1szt/internal/congestion/common"
+	"1szt/quic/congestion/common"
 
 	"github.com/apernet/quic-go/congestion"
 	"github.com/apernet/quic-go/monotime"

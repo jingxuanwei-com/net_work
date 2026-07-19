@@ -5,8 +5,8 @@ import (
 	"log"
 	"strings"
 
-	"1szt/internal/congestion/bbr"
-	"1szt/internal/congestion/brutal"
+	"1szt/quic/congestion/bbr"
+	"1szt/quic/congestion/brutal"
 
 	"github.com/apernet/quic-go"
 )

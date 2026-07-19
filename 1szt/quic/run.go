@@ -1,19 +1,19 @@
-package net_work
+package quic
 
 import (
 	"flag"
 	"fmt"
 
-	"1szt/internal/congestion"
+	"1szt/quic/congestion"
 )
 
 func Run() {
 	mode := flag.String("mode", "client", "启动模式: server / client")
 	tcpPort := flag.String("port", "127.0.0.1:25565", "本地 TCP 端口")
-	quicAddr := flag.String("addr", "ipv4.hxzmc.top:24689", "QUIC 地址(服务端用 :port 监听, 客户端连远程)")
+	quicAddr := flag.String("addr", "ipv4.hxzmc.top:24688", "QUIC 地址(服务端用 :port 监听, 客户端连远程)")
 
 	// 流控参数
-	congType := flag.String("congestion", "bbr", "拥塞控制算法: brutal / bbr")
+	congType := flag.String("congestion", "brutal", "拥塞控制算法: brutal / bbr")
 	bbrProfile := flag.String("bbr-profile", "aggressive", "BBR 配置文件: aggressive / standard / conservative")
 	bandwidth := flag.Uint64("bandwidth", 10_000_000, "Brutal 模式目标带宽 (bps)，如 10000000 = 10Mbps")
 	disableLoss := flag.Bool("disable-loss", true, "Brutal 模式无视丢包 (true=无视丢包猛冲)")

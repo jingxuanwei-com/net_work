@@ -1,4 +1,4 @@
-package net_work
+package quic
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 
 	"github.com/apernet/quic-go"
 
-	"1szt/internal/congestion"
+	"1szt/quic/congestion"
 )
 
 // 作用 连接远程端口quic:ip:port 转换tcp:port

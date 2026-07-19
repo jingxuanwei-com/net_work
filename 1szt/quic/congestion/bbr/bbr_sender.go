@@ -12,7 +12,7 @@ import (
 	"github.com/apernet/quic-go/congestion"
 	"github.com/apernet/quic-go/monotime"
 
-	"1szt/internal/congestion/common"
+	"1szt/quic/congestion/common"
 )
 
 // BbrSender implements BBR congestion control algorithm.  BBR aims to estimate
@@ -718,7 +718,7 @@ func (b *bbrSender) maybeUpdateMinRtt(now monotime.Time, sampleMinRtt time.Durat
 }
 
 // Enters the STARTUP mode.
-func (b *bbrSender) enterStartupMode(now monotime.Time) {
+func (b *bbrSender) enterStartupMode(_ monotime.Time) {
 	b.mode = bbrModeStartup
 	// b.maybeTraceStateChange(logging.CongestionStateStartup)
 	b.pacingGain = b.highGain
