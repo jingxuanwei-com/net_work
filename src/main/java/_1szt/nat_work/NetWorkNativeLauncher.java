@@ -68,35 +68,27 @@ public class NetWorkNativeLauncher {
      */
     private static String getBinaryName(String osName, String osArch) {
         boolean isArm64 = osArch.contains("arm64") || osArch.contains("aarch64");
+        boolean isAmd64 = osArch.contains("amd64") || osArch.contains("x86_64")
+                || (osArch.contains("x86") && !isArm64);
 
-        // Windows
-        if (osName.contains("win")) {
-            String suffix = isArm64 ? "arm64" : "amd64";
-            return "net_work-windows-" + suffix + ".exe";
+        // Windows (仅 amd64)
+        if (osName.contains("win") && isAmd64) {
+            return "net_work-windows-amd64.exe";
         }
 
-        // macOS
+        // macOS (内核名 darwin) - amd64 和 arm64 都有
         if (osName.contains("mac")) {
-            if (isArm64) {
-                return "net_work-mac-arm64";
-            }
-            // 优先使用 mac-x64，不存在则回退 darwin-amd64
-            File macX64 = new File("net_work/net_work-mac-x64");
-            if (macX64.exists()) {
-                return "net_work-mac-x64";
-            }
-            return "net_work-darwin-amd64";
+            return isArm64 ? "net_work-darwin-arm64" : "net_work-darwin-amd64";
         }
 
-        // Linux
-        if (osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) {
-            String suffix = isArm64 ? "arm64" : "amd64";
-            return "net_work-linux-" + suffix;
-        }
-
-        // Android
+        // Android (仅 arm64)
         if (osName.contains("android")) {
             return "net_work-android-arm64";
+        }
+
+        // Linux (仅 amd64)
+        if ((osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) && isAmd64) {
+            return "net_work-linux-amd64";
         }
 
         return null;
