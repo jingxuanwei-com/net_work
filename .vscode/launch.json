@@ -7,7 +7,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/1szt/main",
-            "args": ["-mode", "server", "-port", "25565", "-addr", ":25588"],
+            "args": ["-mode", "server"],
             "cwd": "${workspaceFolder}"
         },
         {
@@ -16,7 +16,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/1szt/main",
-            "args": ["-mode", "client", "-port", "25565", "-addr", "127.0.0.1:25588"],
+            "args": ["-mode", "client"],
             "cwd": "${workspaceFolder}"
         }
     ]

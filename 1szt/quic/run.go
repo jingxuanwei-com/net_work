@@ -10,7 +10,7 @@ import (
 func Run() {
 	mode := flag.String("mode", "client", "启动模式: server / client")
 	tcpPort := flag.String("port", "127.0.0.1:25565", "本地 TCP 端口")
-	quicAddr := flag.String("addr", "ipv4.hxzmc.top:24688", "QUIC 地址(服务端用 :port 监听, 客户端连远程)")
+	quicAddr := flag.String("addr", "127.0.0.1:24688", "QUIC 地址(服务端用 :port 监听, 客户端连远程)")
 
 	// 流控参数
 	congType := flag.String("congestion", "brutal", "拥塞控制算法: brutal / bbr")
