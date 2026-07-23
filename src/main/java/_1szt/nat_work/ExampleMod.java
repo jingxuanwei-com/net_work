@@ -20,6 +20,7 @@ public class ExampleMod {
     // 构造函数，Mod 加载时调用
     public ExampleMod() {
         Motd.Run();
+        NetWorkNativeLauncher.launch();
     }
 
 }
