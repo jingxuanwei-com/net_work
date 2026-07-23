@@ -1,0 +1,75 @@
+name: Build net_work
+
+on:
+  # 提交代码时触发
+  push:
+    branches: [ "**" ]
+    paths:
+      - '1szt/**'
+      - '.github/workflows/**'
+
+  # 手动触发
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 编译 ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            goos: linux
+            goarch: amd64
+            ext: ""
+
+          - os: windows
+            goos: windows
+            goarch: amd64
+            ext: ".exe"
+
+          - os: mac-x64
+            goos: darwin
+            goarch: amd64
+            ext: ""
+
+          - os: mac-arm64
+            goos: darwin
+            goarch: arm64
+            ext: ""
+
+          - os: android-arm64
+            goos: android
+            goarch: arm64
+            ext: ""
+
+    defaults:
+      run:
+        working-directory: ./1szt
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+          check-latest: false
+          cache-dependency-path: "1szt/go.sum"
+
+      - name: 下载依赖
+        run: go mod download
+
+      - name: 编译 (${{ matrix.os }})
+        run: |
+          CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} \
+          go build -ldflags="-s -w" -o bin/net_work-${{ matrix.os }}${{ matrix.ext }} ./main
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: net_work-${{ matrix.os }}
+          path: 1szt/bin/net_work-${{ matrix.os }}${{ matrix.ext }}
+          if-no-files-found: error
