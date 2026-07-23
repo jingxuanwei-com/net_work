@@ -13,34 +13,29 @@ on:
 
 jobs:
   build:
-    name: 编译 ${{ matrix.os }}
+    name: 编译 ${{ matrix.goos }}-${{ matrix.goarch }}
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         include:
-          - os: linux
-            goos: linux
+          - goos: linux
             goarch: amd64
             ext: ""
 
-          - os: windows
-            goos: windows
+          - goos: windows
             goarch: amd64
             ext: ".exe"
 
-          - os: mac-x64
-            goos: darwin
+          - goos: darwin
             goarch: amd64
             ext: ""
 
-          - os: mac-arm64
-            goos: darwin
+          - goos: darwin
             goarch: arm64
             ext: ""
 
-          - os: android-arm64
-            goos: android
+          - goos: android
             goarch: arm64
             ext: ""
 
@@ -62,14 +57,14 @@ jobs:
       - name: 下载依赖
         run: go mod download
 
-      - name: 编译 (${{ matrix.os }})
+      - name: 编译 ${{ matrix.goos }}-${{ matrix.goarch }}
         run: |
           CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} \
-          go build -ldflags="-s -w" -o bin/net_work-${{ matrix.os }}${{ matrix.ext }} ./main
+          go build -ldflags="-s -w" -o bin/net_work-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }} ./main
 
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
         with:
-          name: net_work-${{ matrix.os }}
-          path: 1szt/bin/net_work-${{ matrix.os }}${{ matrix.ext }}
+          name: net_work-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: 1szt/bin/net_work-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }}
           if-no-files-found: error
